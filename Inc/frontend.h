@@ -17,11 +17,15 @@
 #define RX_STEP_CR 30
 #define RX_STEP_FINISHED 0xff
 
+extern unsigned char kmsgpending;
+extern unsigned char msglen;
+
 unsigned char transmitStd(char *line);
 void parseLine(char * line);
 char canmsg2ascii_getNextChar(canmsg_t * canmsg, unsigned char * step);
 void sendFuzzProcess(void);
 unsigned char config_fuzzer(char *config);
 void sendFuzzProcess(void);
+u8 KWP2000FastMessage(char* data);
 
 #endif

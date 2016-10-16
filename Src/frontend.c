@@ -23,8 +23,11 @@
 #include "mcp2515.h"
 #include "tim.h"
 #include "frontend.h"
+#include "kwp2000.h"
 
 unsigned char timestamping = 0;
+unsigned char kmsgpending = 0;
+unsigned char msglen = 0;
 
 /**
  * Parse hex value of given string
@@ -400,6 +403,33 @@ void parseLine(char * line) {
 			}
 			result = 13;
 			break;
+		case 'k':  //K Line transreceiver;
+			if (kmsgpending==0)
+			{
+				switch(line[1])
+				{
+					case 'i':   //i stand for ISO9141-2
+						break; //not support yet;
+					case 'I': //I stand for KWP2000_5BAUD
+						break; //not support yet;
+					case 'k': //k stand for KWP2000_FAST
+						if (k_state == K_UNKNOWN)
+						{
+							KWP2000_Fast_Init();
+						}
+						if(k_state == K_KWP2000_FAST_ACTIVE)
+						{
+							if (KWP2000FastMessage(&line[2]))
+							{
+								kmsgpending = 1;
+								printf("%c",'k');
+								result = 13;
+							}
+						}
+						break;
+				}
+			}
+			break;
 	}
 	
 	printf("%c",result);
@@ -621,3 +651,22 @@ unsigned char config_fuzzer(char *config)
 	}
 	return 1;
 }
+
+
+u8 KWP2000FastMessage(char* data)
+{
+	unsigned long len,temp;
+	int i;
+	if (!parseHex(data,2,&len)) return 0;
+	for (i = 0;i<len; i++) 
+	{
+		if (!parseHex(&data[2+i*2],2,&temp)) return 0;
+		sendmessage[i] = temp;
+	}
+	
+	sendmessage[len-1] = checksum(sendmessage,len-1);
+	msglen = len;
+	return 1;
+}
+
+

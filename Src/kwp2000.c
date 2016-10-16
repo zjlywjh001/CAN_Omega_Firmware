@@ -10,6 +10,7 @@ u8 KWP2000ProtocolVersion[2];
 vu16 timer1 = 0;
 vu16 timer2 = 0;
 vu16 timerKW = 0;
+int p3_timer = 0;
 
 
 u8  kwp2000_max_init_attempts = 2; 
@@ -19,6 +20,10 @@ u8  kwp2000_interbyte_delay = 2;
 u8  kwp2000_interbyte_delaymax = 40;
 u16 kwp2000_intermessage_delay = 10; 
 u16 kwp2000_intermessage_delaymax = 500; 
+
+u8 recvmessage[256];
+u8 sendmessage[256];
+u8 k_state = K_UNKNOWN;
 
 
 /* ISO9141Init
@@ -153,6 +158,50 @@ u8 ISO9141Init(u16 * uartSpeed)
   return 0x00;
 }
 
+void KWP2000_Fast_Init()
+{
+
+	if (k_state == K_UNKNOWN)
+	{
+		TXDK(0);
+		TXDL(0);
+		delay_us(25000);
+		TXDK(1);
+		TXDL(1);
+		MX_USART2_UART_Init(10400);
+		delay_us(25000);
+		p3_timer = 3000;
+		k_state = K_KWP2000_FAST_ACTIVE;
+	}
+	
+}
+
+u8 KWP2000_Fast_Transreceiver(u8 *msg,int len,u8* recvbuffer)
+{
+	int i;
+	HAL_UART_Transmit(&huart2,msg,len,0xFFFF);
+	
+	u8 rubbish;
+	rubbish = huart2.Instance->DR & 0x00FF;
+	delay_us(10000);
+	
+	i = 0;
+	timer1 = 100;
+	while (timer1)
+	{
+		while ((__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE) == RESET) && timer1);
+		if (timer1==0) 
+			break;
+		recvbuffer[i] = huart2.Instance->DR & 0x00FF;
+		timer1 = 100;
+		i++;
+	}
+	
+	return i;
+	
+	
+}
+
 void Init_5Baud(u8 addr)
 {
 	int i;
@@ -173,6 +222,18 @@ void Init_5Baud(u8 addr)
 	delay_us(200000);
 	
 	
+}
+
+u8 checksum(u8* data,u8 len)
+{
+	u8 i;
+	u8 sum;
+	sum = 0;
+	for (i=0;i<len;i++)
+	{
+		sum = sum + data[i];
+	}
+	return sum;
 }
 
 /* KWP2000SendByteReceiveAnswer - wysyla bajt b oraz weryfikuje na zanegowana odpowiedz od ECU

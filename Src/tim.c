@@ -211,6 +211,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		{
 			timer1--;
 		}
+		if (p3_timer!=0)
+		{
+			p3_timer--;
+			if (p3_timer==0)
+			{
+				k_state = K_UNKNOWN;
+			}
+		}
 		if (txledstatus)
 		{
 			txledcounter ++;

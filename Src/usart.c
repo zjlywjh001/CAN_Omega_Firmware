@@ -68,7 +68,7 @@ void MX_USART1_UART_Init(void)
 
 /* USART2 init function */
 
-void MX_USART2_UART_Init(u8 baud)
+void MX_USART2_UART_Init(int baud)
 {
 
   huart2.Instance = USART2;

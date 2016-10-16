@@ -144,7 +144,6 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	//u16 kbaud = 10400;
-	ISO9141Init(0);
 	
   while (1)
   {
@@ -246,6 +245,20 @@ int main(void)
 				
 			}
 			
+		}
+		
+		if (kmsgpending)
+		{
+			int resplen = KWP2000_Fast_Transreceiver(sendmessage,msglen,recvmessage);
+			if (resplen>0)
+			{
+				printf("%c",'k');
+				for (int i=0;i<resplen;i++)
+				{
+					printf("%02x",recvmessage[i]);
+				}
+			}
+			kmsgpending = 0;
 		}
 	
 

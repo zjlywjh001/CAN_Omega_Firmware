@@ -89,4 +89,5 @@ void ResetFuzzer(void);
 void TXDK(u8 state);
 void TXDL(u8 state);
 void USART2_Deinit(void);
+
 #endif
