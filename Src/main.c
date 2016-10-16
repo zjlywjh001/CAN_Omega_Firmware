@@ -41,6 +41,7 @@
 #include "led.h"
 #include "tim.h"
 #include "frontend.h"
+#include "kwp2000.h"
 
 #ifdef __GNUC__
   #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
@@ -111,6 +112,7 @@ int main(void)
   MX_SPI1_Init();
   MX_USART1_UART_Init();
 	MX_TIM2_Init();
+	MX_TIM3_Init();
 	MX_TIM5_Init();
 	
 	mcp2515_init();
@@ -121,6 +123,9 @@ int main(void)
 	RXLED_OFF;
 	txledstatus = 0;
 	rxledstatus = 0;
+	
+	HAL_TIM_Base_Stop(&htim5);
+	HAL_TIM_Base_Stop(&htim3);
 	HAL_TIM_Base_Start_IT(&htim2);
 	HAL_UART_Receive_IT(&huart1,&uart_recvdata,1);  
 	//HAL_UART_Receive(&huart1, &uart_recvdata,1, 0xFFFF);
@@ -138,6 +143,9 @@ int main(void)
 	
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	//u16 kbaud = 10400;
+	ISO9141Init(0);
+	
   while (1)
   {
 		//printf("Hello World!\r\n");
@@ -148,29 +156,42 @@ int main(void)
 		{
 			if (mcp2515_receive_message(&canmsg_buffer[canmsg_buffer_canpos]))
 			{
-					if (fuzz && fuzzuntil && (!fuzzpause) && (!fuzzfin)) 
+				canmsg_t recvmsg = canmsg_buffer[canmsg_buffer_canpos];
+				if ((recvmsg.data[0]&0xF0)>>4==0x01)   //if a multi-frame message send flow control message
+				{
+					canmsg_t fcmsg;
+					fcmsg.id = recvmsg.id;
+					fcmsg.dlc = 3;
+					fcmsg.flags.extended = recvmsg.flags.extended;
+					fcmsg.data[0] = 0x30;
+					for (int i=1;i<8;i++)
 					{
-						canmsg_t recvmsg = canmsg_buffer[canmsg_buffer_canpos];
-						int i;
-						if (recvmsg.dlc>=comparelength) 
-						{
-							for (i = 0;i< recvmsg.dlc;i++) 
-							{
-								if (!(fuzzuntilmask&(1<<i)))
-									continue;
-								if (recvmsg.data[i]!=fuzzuntildata[i]) 
-									break;
-							}
-							if (i==recvmsg.dlc) 
-							{
-								fuzzfin = 1;
-								ResetFuzzer() ;
-							}
-						}
-						
+						fcmsg.data[i] = 0;
 					}
-					canmsg_buffer_canpos = (canmsg_buffer_canpos + 1) % CANMSG_BUFFERSIZE;
-					canmsg_buffer_filled++;                
+					while (mcp2515_send_message(&fcmsg)==0);
+				}
+				if (fuzz && fuzzuntil && (!fuzzpause) && (!fuzzfin)) 
+				{
+					int i;
+					if (recvmsg.dlc>=comparelength) 
+					{
+						for (i = 0;i< recvmsg.dlc;i++) 
+						{
+							if (!(fuzzuntilmask&(1<<i)))
+								continue;
+							if (recvmsg.data[i]!=fuzzuntildata[i]) 
+								break;
+						}
+						if (i==recvmsg.dlc) 
+						{
+							fuzzfin = 1;
+							ResetFuzzer() ;
+						}
+					}
+					
+				}
+				canmsg_buffer_canpos = (canmsg_buffer_canpos + 1) % CANMSG_BUFFERSIZE;
+				canmsg_buffer_filled++;                
 			}
     }
 		

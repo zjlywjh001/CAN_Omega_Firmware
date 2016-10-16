@@ -425,6 +425,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\frontend.c</FilePath>
             </File>
+            <File>
+              <FileName>kwp2000.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\kwp2000.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

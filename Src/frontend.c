@@ -307,7 +307,7 @@ void parseLine(char * line) {
 					}
 					
 				}
-				else if ((line[1]=='d' || line[1]=='D')&&(!fuzz))
+				else if ((line[1]=='d' || line[1]=='D')&&(!fuzz)) //config & start fuzzing
 				{
 					if (config_fuzzer(&line[1]))
 					{

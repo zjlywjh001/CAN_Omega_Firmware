@@ -11,6 +11,7 @@
 #include "stm32f4xx.h"
 #include "stdio.h"
 
+
 /*!< STM32F10x Standard Peripheral Library old types (maintained for legacy purpose) */
 typedef int32_t  s32;
 typedef int16_t s16;
@@ -85,4 +86,7 @@ u8 SPI1_TransferByte(u8 byte);
 //void fuzz_test_setting(void);
 void getNextFuzzData(void);
 void ResetFuzzer(void);
+void TXDK(u8 state);
+void TXDL(u8 state);
+void USART2_Deinit(void);
 #endif
