@@ -143,7 +143,8 @@ int main(void)
 	
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	//u16 kbaud = 10400;
+	u16 kbaud = 0;
+	ISO9141Init(&kbaud);
 	
   while (1)
   {

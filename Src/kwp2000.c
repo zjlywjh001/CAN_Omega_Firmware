@@ -39,16 +39,9 @@ u8 ISO9141Init(u16 * uartSpeed)
   int i;
   u16 time, t2;
 	
-	USART2_Deinit();
-
-	Init_5Baud(0x33);
+	Init_5Baud(0x01);
 	
-//	TXDK(0);
-//	TXDL(0);
-//	delay_us(25000);
-//	TXDK(1);
-//	TXDL(1);
-//  timer1=1000;
+  timer1=1000;
 
   if (0 == (*uartSpeed))
   {
@@ -205,6 +198,7 @@ u8 KWP2000_Fast_Transreceiver(u8 *msg,int len,u8* recvbuffer)
 void Init_5Baud(u8 addr)
 {
 	int i;
+	USART2_Deinit();
 	TXDK(0); //start bit
 	TXDL(0);
 	delay_us(200000);
@@ -220,7 +214,6 @@ void Init_5Baud(u8 addr)
 	TXDK(1); //stop bit
 	TXDL(1);
 	delay_us(200000);
-	
 	
 }
 

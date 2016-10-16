@@ -153,9 +153,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>220</LineNumber>
+          <LineNumber>229</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134286380</Address>
+          <Address>134286856</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -164,7 +164,23 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>../Src/main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\Can_Omega\../Src/main.c\220</Expression>
+          <Expression>\\Can_Omega\../Src/main.c\229</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>228</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134286848</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>../Src/main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\Can_Omega\../Src/main.c\228</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -277,6 +293,36 @@
           <count>21</count>
           <WinNumber>1</WinNumber>
           <ItemText>addr</ItemText>
+        </Ww>
+        <Ww>
+          <count>22</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>msg</ItemText>
+        </Ww>
+        <Ww>
+          <count>23</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>x</ItemText>
+        </Ww>
+        <Ww>
+          <count>24</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>sendmessage</ItemText>
+        </Ww>
+        <Ww>
+          <count>25</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>recvmessage</ItemText>
+        </Ww>
+        <Ww>
+          <count>26</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>kmsgpending</ItemText>
+        </Ww>
+        <Ww>
+          <count>27</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>uartSpeed</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

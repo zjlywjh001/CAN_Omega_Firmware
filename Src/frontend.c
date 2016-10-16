@@ -408,7 +408,7 @@ void parseLine(char * line) {
 			{
 				switch(line[1])
 				{
-					case 'i':   //i stand for ISO9141-2
+					case 'i':   //i stand for ISO9141-20
 						break; //not support yet;
 					case 'I': //I stand for KWP2000_5BAUD
 						break; //not support yet;
@@ -416,19 +416,24 @@ void parseLine(char * line) {
 						if (k_state == K_UNKNOWN)
 						{
 							KWP2000_Fast_Init();
+							//k_state = K_KWP2000_FAST_ACTIVE;
 						}
 						if(k_state == K_KWP2000_FAST_ACTIVE)
 						{
 							if (KWP2000FastMessage(&line[2]))
 							{
 								kmsgpending = 1;
-								printf("%c",'k');
+								printf("%c",'z');
 								result = 13;
 							}
 						}
 						break;
 				}
 			}
+			break;
+		case 'U':  //firmware upgrade
+			__set_FAULTMASK(1);
+			HAL_NVIC_SystemReset();
 			break;
 	}
 	
