@@ -137,14 +137,12 @@ int main(void)
 	ResetFuzzer();
 	
 	//fuzz_test_setting();
-	
 	//printf("Hello World!\r\n");
   /* USER CODE END 2 */
 	
+	
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	u16 kbaud = 0;
-	ISO9141Init(&kbaud);
 	
   while (1)
   {
@@ -258,6 +256,7 @@ int main(void)
 				{
 					printf("%02x",recvmessage[i]);
 				}
+				printf("\r");
 			}
 			kmsgpending = 0;
 		}

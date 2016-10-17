@@ -409,13 +409,14 @@ void parseLine(char * line) {
 				switch(line[1])
 				{
 					case 'i':   //i stand for ISO9141-20
-						break; //not support yet;
+						break; // deprecated
 					case 'I': //I stand for KWP2000_5BAUD
-						break; //not support yet;
+						break; // deprecated
 					case 'k': //k stand for KWP2000_FAST
 						if (k_state == K_UNKNOWN)
 						{
 							KWP2000_Fast_Init();
+							//Init_5Baud(0x33);
 							//k_state = K_KWP2000_FAST_ACTIVE;
 						}
 						if(k_state == K_KWP2000_FAST_ACTIVE)
@@ -584,6 +585,7 @@ void sendFuzzProcess()
 	}
 	
 	printf("\r");
+	
 }
 
 unsigned char config_fuzzer(char *config)

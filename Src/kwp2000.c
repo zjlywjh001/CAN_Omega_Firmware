@@ -33,6 +33,7 @@ u8 k_state = K_UNKNOWN;
      0x8f - odczytany zostal inny bajt niz wyslany (halfduplex)
      0xff - timeout
 */
+/*
 u8 ISO9141Init(u16 * uartSpeed) 
 {
   u8 c, keyword;
@@ -149,7 +150,7 @@ u8 ISO9141Init(u16 * uartSpeed)
 
   timer1 = 0;
   return 0x00;
-}
+}*/
 
 void KWP2000_Fast_Init()
 {
@@ -213,7 +214,25 @@ void Init_5Baud(u8 addr)
 	
 	TXDK(1); //stop bit
 	TXDL(1);
+	
 	delay_us(200000);
+	
+	MX_USART2_UART_Init(10400);
+	
+	timer1 = 100;
+	while ((__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE) == RESET) && timer1);
+	
+	if (timer1==0)
+	{
+		return ;
+	}
+	u8 c= huart2.Instance->DR & 0x00FF;
+		
+  if (0x55 != c) 
+  {
+     return ; //sync err 
+  }
+	
 	
 }
 
@@ -240,6 +259,7 @@ u8 checksum(u8* data,u8 len)
      kwp2000_max_byte_transmit_attempts = 3;
      kwp2000_interbyte_delaymax = 40; 
 */
+/*
 u8 KWP2000SendByteReceiveAnswer (u8 b) 
 {
   u8 c;
@@ -275,7 +295,7 @@ u8 KWP2000SendByteReceiveAnswer (u8 b)
     return 0x00; // all ok
   }
   return 0xff; // trzy proby nieudane
-}
+}*/
 
 /* KWP2000SendBlock - wysyla blok danych do ecu
      errors:
@@ -285,6 +305,7 @@ u8 KWP2000SendByteReceiveAnswer (u8 b)
      
      u8 kwp2000_interbyte_delay = 2;
 */  
+/*
 u8 KWP2000SendBlock(KWP2000struct_t * block)
 {
   u8 i;
@@ -356,7 +377,7 @@ u8 KWP2000SendBlock(KWP2000struct_t * block)
   }
   
   return 0x00; //wyslanie bloku zakonczylo sie powodzeniem
-}
+}*/
 
 
 /* KWP2000ReceiveByteSendAnswer - odbiera bajt b oraz wysyla jego zanegowana wartosc do ECU
@@ -369,6 +390,7 @@ u8 KWP2000SendBlock(KWP2000struct_t * block)
      kwp2000_interbyte_delaymax = 40;
      kwp2000_interbyte_delay = 2;
 */
+/*
 u8 KWP2000ReceiveByteSendAnswer (u8 * b) 
 {
   u8 resp;
@@ -401,7 +423,7 @@ u8 KWP2000ReceiveByteSendAnswer (u8 * b)
   }
   
   return 0x00;
-}
+}*/
 
 /* KWP2000ReceiveBlock - odebranie bloku z ecu
 
@@ -413,6 +435,7 @@ errors:
 
 u16 kwp2000_intermessage_delaymax = 500;
 */
+/*
 u8 KWP2000ReceiveBlock(KWP2000struct_t * block) 
 {
   u8 i;
@@ -462,5 +485,5 @@ u8 KWP2000ReceiveBlock(KWP2000struct_t * block)
   }
 
   return 0x00; //wyslanie bloku zakonczylo sie powodzeniem
-}
+}*/
 
