@@ -37,6 +37,7 @@
 #include "tim.h"
 #include "led.h"
 #include "kwp2000.h"
+#include "j1850.h"
 
 unsigned short clock_msticker;
 
@@ -218,6 +219,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			{
 				k_state = K_UNKNOWN;
 			}
+		}
+		if (idletimeout!=0)
+		{
+			idletimeout--;
 		}
 		if (txledstatus)
 		{

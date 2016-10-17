@@ -430,6 +430,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\kwp2000.c</FilePath>
             </File>
+            <File>
+              <FileName>j1850.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\j1850.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

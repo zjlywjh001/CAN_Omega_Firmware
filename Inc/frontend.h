@@ -27,5 +27,6 @@ void sendFuzzProcess(void);
 unsigned char config_fuzzer(char *config);
 void sendFuzzProcess(void);
 u8 KWP2000FastMessage(char* data);
+u8 J1850VPWMessage(char* data);
 
 #endif

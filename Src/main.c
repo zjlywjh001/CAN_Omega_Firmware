@@ -42,6 +42,7 @@
 #include "tim.h"
 #include "frontend.h"
 #include "kwp2000.h"
+#include "j1850.h"
 
 #ifdef __GNUC__
   #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
@@ -127,7 +128,9 @@ int main(void)
 	HAL_TIM_Base_Stop(&htim5);
 	HAL_TIM_Base_Stop(&htim3);
 	HAL_TIM_Base_Start_IT(&htim2);
-	HAL_UART_Receive_IT(&huart1,&uart_recvdata,1);  
+	
+	HAL_UART_Receive_IT(&huart1,&uart_recvdata,1);
+	
 	//HAL_UART_Receive(&huart1, &uart_recvdata,1, 0xFFFF);
 	canmsg_t canmsg_buffer[CANMSG_BUFFERSIZE];
 	unsigned char canmsg_buffer_filled = 0;
@@ -143,6 +146,7 @@ int main(void)
 	
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
 	
   while (1)
   {
@@ -260,7 +264,23 @@ int main(void)
 			}
 			kmsgpending = 0;
 		}
+		
+		u8 cnt = j1850_vpw_recv_msg(j1850_recv);
 	
+		if (cnt>0 && (!(cnt&0x80)))
+		{
+			
+			if (j1850_recv[cnt-1]==j1850_crc(j1850_recv,cnt-1))  //CRC match
+			{
+				printf("%c",'j');
+				for (int i=0;i<cnt;i++)
+				{
+					printf("%02x",j1850_recv[i]);
+				}
+				printf("\r");
+			}  //drop bad crc packet
+			cnt = 0;	
+		}
 
   }
 		/* USER CODE END WHILE */

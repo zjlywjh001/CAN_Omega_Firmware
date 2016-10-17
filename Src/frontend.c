@@ -24,6 +24,7 @@
 #include "tim.h"
 #include "frontend.h"
 #include "kwp2000.h"
+#include "j1850.h"
 
 unsigned char timestamping = 0;
 unsigned char kmsgpending = 0;
@@ -432,6 +433,28 @@ void parseLine(char * line) {
 				}
 			}
 			break;
+		case 'j':  //j1850 PWM/VPW transreceiver
+			switch(line[1])
+			{
+				case 'p':  //PWM Mode
+					break;
+				case 'v':  //VPW mode
+					if (j1850_mode != MODE_VPW)
+					{
+						j1850_vpw_init();
+					}
+					if (j1850_mode == MODE_VPW)
+					{
+						if (J1850VPWMessage(&line[2]))
+						{
+							printf("%c",'z');
+							result = 13;
+							
+						}
+					}
+					break;
+			}
+			break;
 		case 'U':  //firmware upgrade
 			__set_FAULTMASK(1);
 			HAL_NVIC_SystemReset();
@@ -676,4 +699,30 @@ u8 KWP2000FastMessage(char* data)
 	return 1;
 }
 
+
+u8 J1850VPWMessage(char* data)
+{
+	unsigned long len,temp;
+	int i;
+	if (!parseHex(data,2,&len)) return 0;
+	for (i = 0;i<len; i++) 
+	{
+		if (!parseHex(&data[2+i*2],2,&temp)) return 0;
+		j1850_send[i] = temp;
+	}
+	
+	j1850_send[len-1] = j1850_crc(j1850_send,len-1);
+	j1850_msglen = len;
+	
+	if (j1850_vpw_send_msg(j1850_send,j1850_msglen)==1)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+	
+	
+}
 
