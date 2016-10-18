@@ -9,6 +9,7 @@ u8 j1850_mode = MODE_UNKNOWN;
 u8 j1850_send[12];
 u8 j1850_recv[12];
 u8 j1850_msglen;
+u8 j1850_ifr = 0;
 
 /* 
 **--------------------------------------------------------------------------- 
@@ -326,25 +327,34 @@ uint8_t j1850_vpw_send_msg(uint8_t *msg_buf, int8_t nbytes)
 ** Parameters: Pointer to frame buffer, frame length
 ** 
 ** Returns: 0 = error
-**          1 = OK
+**          other - IFR
 ** 
 **--------------------------------------------------------------------------- 
 */ 
 uint8_t j1850_pwm_send_msg(uint8_t *msg_buf, int8_t nbytes)
 {
+	u8 val = 0;
+	
+	j1850_ifr = msg_buf[2];
 	if(nbytes > 12)	return J1850_RETURN_CODE_DATA_ERROR;	// error, message to long, see SAE J1850
 
-	if (j1850_pwm_wait_idle())
-		return 0;	// wait for idle bus
+//	if (j1850_pwm_wait_idle())
+//		return 0;	// wait for idle bus
 
-	timer1_start();	
-	j1850_pwm_active();	// set bus active
 	
-	while(__HAL_TIM_GET_COUNTER(&htim3) < PWM_TX_SOF);	// transmit SOF symbol
-	j1850_pwm_passive(); //set bus passive
+	j1850_pwm_active();	// set bus active
+	//timer1_start();	
+	//while(__HAL_TIM_GET_COUNTER(&htim3) < PWM_TX_SOF);	// transmit SOF symbol
+	delay_us(30);
+	
 	
 	if (j1850_pwm_wait_idle())
 		return 0;	// wait for idle bus
+	j1850_pwm_passive();
+	
+	delay_us(18);
+	
+	//while(__HAL_TIM_GET_COUNTER(&htim3) < PWM_TX_TP4);	// transmit SOF symbol
 	
 	
 	uint16_t delay;		// bit delay time
@@ -362,7 +372,7 @@ uint8_t j1850_pwm_send_msg(uint8_t *msg_buf, int8_t nbytes)
 			j1850_pwm_passive();
 			timer1_start();
 			delay = (msg_buf[i]&(1<<(7-j))) ? (PWM_TX_BIT-PWM_TX_SHORT) : (PWM_TX_BIT-PWM_TX_LONG);
-				
+			delay_us(1);
 			while (__HAL_TIM_GET_COUNTER(&htim3) <= delay)	// wait
 			{
 				if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5)==SET)	// check for bus error
@@ -373,13 +383,161 @@ uint8_t j1850_pwm_send_msg(uint8_t *msg_buf, int8_t nbytes)
 			}
 		}
 	}
-	 
+	//j1850_pwm_active(); //end of last symbol
+	
+	//delay_us(5);
   j1850_passive();	// send EOF symbol
+	
   timer1_start();
-  while (__HAL_TIM_GET_COUNTER(&htim3) <= PWM_TX_EOF); // wait for EOF complete
+
+	
+	
+	//Wait for IFR
+	while (__HAL_TIM_GET_COUNTER(&htim3) <= PWM_RX_TP4_MAX&&(!is_j1850_pwm_active())) ;
+	
+	if (__HAL_TIM_GET_COUNTER(&htim3) <= PWM_RX_TP4_MAX)
+	{
+		//Receive IFR
+		
+		for (int i=0;i<8;i++)
+		{
+			
+			val <<= 1;
+			timer1_start();
+			
+			while (__HAL_TIM_GET_COUNTER(&htim3) <= 9);
+			
+			if (!is_j1850_pwm_active())
+			{
+				val|=1;
+			}
+			else 
+			{
+				while (__HAL_TIM_GET_COUNTER(&htim3) <= PWM_RX_TP4_MAX&&(is_j1850_pwm_active())) ;
+			}
+			
+			while (__HAL_TIM_GET_COUNTER(&htim3) <= PWM_RX_TP4_MAX&&(!is_j1850_pwm_active())) ;
+
+		}
+
+	}
+	
+	
+  //while (__HAL_TIM_GET_COUNTER(&htim3) <= PWM_TX_EOF); // wait for EOF complete
+
 	timer1_stop();
-  return J1850_RETURN_CODE_OK;	// no error
+
+  return val;
 }
+
+
+/* 
+**--------------------------------------------------------------------------- 
+** 
+** Abstract: Receive J1850 PWM frame (maximum 12 bytes)
+** 
+** Parameters: Pointer to frame buffer, frame length
+** 
+** Returns: 0 = error
+**          other = OK
+** 
+**--------------------------------------------------------------------------- 
+*/ 
+uint8_t j1850_pwm_recv_msg(uint8_t *msg_buf)
+{
+	
+	u8 val,nbytes;
+	u16 delay;
+	nbytes = 0;
+	
+	timer1_start();
+	while (__HAL_TIM_GET_COUNTER(&htim3) <= 2000 && !is_j1850_pwm_active()); //wait for sof
+	if (__HAL_TIM_GET_COUNTER(&htim3) > 2000)
+	{
+		timer1_stop();
+		return J1850_RETURN_CODE_NO_DATA | 0x80;	// error, no responds
+	}
+	
+	timer1_start();
+	while (__HAL_TIM_GET_COUNTER(&htim3) <= 33 && is_j1850_pwm_active()); //wait for sof
+	if (__HAL_TIM_GET_COUNTER(&htim3) < 25)  //not a sof
+	{
+		timer1_stop();
+		return J1850_RETURN_CODE_BUS_ERROR | 0x80;	//  sof error
+	}
+	while (__HAL_TIM_GET_COUNTER(&htim3) <= 63 && !is_j1850_pwm_active()); //wait for sofwhile (!is_j1850_pwm_active());
+	if (__HAL_TIM_GET_COUNTER(&htim3) > 51 )  //not a sof
+	{
+		timer1_stop();
+		return J1850_RETURN_CODE_BUS_ERROR | 0x80;	//  sof error
+	}
+	
+	while (1)
+	{
+		val = 0;
+		
+		for (int i=0;i<8;i++)
+		{
+			
+			val <<= 1;
+			timer1_start();
+			
+			while (__HAL_TIM_GET_COUNTER(&htim3) <= 8);
+			
+			if (!is_j1850_pwm_active())
+			{
+				val|=1;
+			}
+			else 
+			{
+				while (__HAL_TIM_GET_COUNTER(&htim3) < 48&&(is_j1850_pwm_active())) ;
+			}
+			
+			while (__HAL_TIM_GET_COUNTER(&htim3) < 48&&(!is_j1850_pwm_active())) ;
+
+		}
+		if (__HAL_TIM_GET_COUNTER(&htim3) < 48)
+		{
+			msg_buf[nbytes++] = val;
+		}
+		else
+		{
+			break;
+		}
+	}
+	
+	// send IFR 
+	for (int j=0;j<=7;j++)
+	{
+		j1850_pwm_active();
+		timer1_start();
+		
+		delay = (j1850_ifr&(1<<(7-j))) ? PWM_TX_SHORT : PWM_TX_LONG;	// send correct pulse lenght
+		while (__HAL_TIM_GET_COUNTER(&htim3) <= delay) {}	// wait
+	
+		j1850_pwm_passive();
+		timer1_start();
+		delay = (j1850_ifr&(1<<(7-j))) ? (PWM_TX_BIT-PWM_TX_SHORT) : (PWM_TX_BIT-PWM_TX_LONG);
+		delay_us(1);
+		while (__HAL_TIM_GET_COUNTER(&htim3) <= delay)	// wait
+		{
+			if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5)==SET)	// check for bus error
+			{
+				timer1_stop();
+				return J1850_RETURN_CODE_BUS_ERROR | 0x80;	// error, bus collision!
+			}
+		}
+	}
+	
+	timer1_stop();
+		
+	if (nbytes>12)
+		nbytes = 12;
+	
+	return nbytes;
+	
+}
+
 
 /* 
 **--------------------------------------------------------------------------- 

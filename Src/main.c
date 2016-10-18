@@ -95,6 +95,7 @@ void SystemClock_Config(void);
 
 int main(void)
 {
+	u8 cnt;
 
   /* USER CODE BEGIN 1 */
 
@@ -141,8 +142,22 @@ int main(void)
 	
 	//fuzz_test_setting();
 	//printf("Hello World!\r\n");
+
   /* USER CODE END 2 */
-	
+//	j1850_pwm_init();
+//	j1850_send[0] = 0x61;
+//	j1850_send[1] = 0x6A;
+//	j1850_send[2] = 0xF1;
+//	j1850_send[3] = 0x01;
+//	j1850_send[4] = 0x0c;
+//	j1850_send[5] = j1850_crc(j1850_send,5);
+//	
+//	while (1)
+//	{
+//		j1850_pwm_send_msg(j1850_send,6);
+//		j1850_pwm_recv_msg(j1850_recv);
+//		delay_us(500000);
+//	}
 	
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -265,21 +280,28 @@ int main(void)
 			kmsgpending = 0;
 		}
 		
-		u8 cnt = j1850_vpw_recv_msg(j1850_recv);
+		if (j1850_mode==MODE_VPW)
+		{
+			cnt = j1850_vpw_recv_msg(j1850_recv);
 	
-		if (cnt>0 && (!(cnt&0x80)))
+			if (cnt>0 && (!(cnt&0x80)))
+			{
+				
+				if (j1850_recv[cnt-1]==j1850_crc(j1850_recv,cnt-1))  //CRC match
+				{
+					printf("%c",'j');
+					for (int i=0;i<cnt;i++)
+					{
+						printf("%02x",j1850_recv[i]);
+					}
+					printf("\r");
+				}  //drop bad crc packet
+				cnt = 0;	
+			}
+		}
+		else if (j1850_mode == MODE_PWM)
 		{
 			
-			if (j1850_recv[cnt-1]==j1850_crc(j1850_recv,cnt-1))  //CRC match
-			{
-				printf("%c",'j');
-				for (int i=0;i<cnt;i++)
-				{
-					printf("%02x",j1850_recv[i]);
-				}
-				printf("\r");
-			}  //drop bad crc packet
-			cnt = 0;	
 		}
 
   }

@@ -36,11 +36,15 @@
 #define TX_EOF		280		// End Of Frame nominal time
 #define TX_BRK		300		// Break nominal time
 #define TX_IFS		300		// Inter Frame Separation nominal time
-#define PWM_TX_SOF 20  //32us actually
-#define PWM_TX_EOF 72   //
-#define PWM_TX_SHORT 4  //8us actually
+#define PWM_TX_SOF 12  //32us actually
+#define PWM_RX_SOF_MAX 13   //51us actually
+#define PWM_TX_TP4 15  //48us actually
+#define PWM_TX_EOF 60   //
+#define PWM_TX_SHORT 5  //8us actually
 #define PWM_TX_LONG 12   //16us actually
-#define PWM_TX_BIT 20  //24us actually
+#define PWM_TX_BIT 22 //24us actually
+#define PWM_RX_TP4_MIN 46
+#define PWM_RX_TP4_MAX 63
 
 // see SAE J1850 chapter 6.6.2.5 for preferred use of In Frame Respond/Normalization pulse
 #define TX_IFR_SHORT_CRC	64	// short In Frame Respond, IFR contain CRC
@@ -75,6 +79,7 @@ extern u8 j1850_mode;
 extern u8 j1850_send[12];
 extern u8 j1850_recv[12];
 extern u8 j1850_msglen;
+extern u8 j1850_ifr;
 
 
 static inline void timer1_start(void)
@@ -99,6 +104,7 @@ extern uint8_t j1850_vpw_recv_msg(uint8_t *msg_buf );
 extern uint8_t j1850_vpw_send_msg(uint8_t *msg_buf, int8_t nbytes);
 extern uint8_t j1850_crc(uint8_t *msg_buf, int8_t nbytes);
 uint8_t j1850_pwm_send_msg(uint8_t *msg_buf, int8_t nbytes);
+uint8_t j1850_pwm_recv_msg(uint8_t *msg_buf);
 
 
 #endif // __J1850_H__

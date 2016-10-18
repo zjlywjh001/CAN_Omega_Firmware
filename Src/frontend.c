@@ -409,10 +409,10 @@ void parseLine(char * line) {
 			{
 				switch(line[1])
 				{
-					case 'i':   //i stand for ISO9141-20
-						break; // deprecated
+					case 'i':   //i stand for ISO9141-2
+						break; // outdated
 					case 'I': //I stand for KWP2000_5BAUD
-						break; // deprecated
+						break; // outdated
 					case 'k': //k stand for KWP2000_FAST
 						if (k_state == K_UNKNOWN)
 						{
@@ -437,6 +437,18 @@ void parseLine(char * line) {
 			switch(line[1])
 			{
 				case 'p':  //PWM Mode
+					if (j1850_mode != MODE_PWM)
+					{
+						j1850_pwm_init();
+					}
+					if (j1850_mode == MODE_PWM)
+					{
+						printf("%c",'w');
+						if (J1850PWMMessage(&line[2]))
+						{
+							return ;
+						}
+					}
 					break;
 				case 'v':  //VPW mode
 					if (j1850_mode != MODE_VPW)
@@ -711,10 +723,10 @@ u8 J1850VPWMessage(char* data)
 		j1850_send[i] = temp;
 	}
 	
-	j1850_send[len-1] = j1850_crc(j1850_send,len-1);
+	j1850_send[len-1] = j1850_crc((u8*)j1850_send,len-1);
 	j1850_msglen = len;
 	
-	if (j1850_vpw_send_msg(j1850_send,j1850_msglen)==1)
+	if (j1850_vpw_send_msg((u8*)j1850_send,j1850_msglen)==1)
 	{
 		return 1;
 	}
@@ -722,7 +734,41 @@ u8 J1850VPWMessage(char* data)
 	{
 		return 0;
 	}
+}
+
+u8 J1850PWMMessage(char* data)
+{
+	unsigned long len,temp;
+	u8 recvbuffer[12];
+	int i;
+	if (!parseHex(data,2,&len)) return 0;
+	for (i = 0;i<len; i++) 
+	{
+		if (!parseHex(&data[2+i*2],2,&temp)) return 0;
+		j1850_send[i] = temp;
+	}
 	
+	j1850_send[len-1] = j1850_crc((u8*)j1850_send,len-1);
+	j1850_msglen = len;
 	
+
+	j1850_pwm_send_msg((u8*)j1850_send,j1850_msglen);
+	u8 cnt = j1850_pwm_recv_msg((u8*)recvbuffer);
+	if (cnt>0 && (!(cnt&0x80)))
+	{
+		if (1) 
+		{
+			printf("%c",'j');
+			for (int i=0;i<cnt;i++)
+			{
+				printf("%02x",recvbuffer[i]);
+			}
+			printf("\r");
+		} 
+		cnt = 0;	
+	}
+
+	
+	return 1;
 }
 
