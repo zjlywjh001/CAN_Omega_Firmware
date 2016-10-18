@@ -144,20 +144,6 @@ int main(void)
 	//printf("Hello World!\r\n");
 
   /* USER CODE END 2 */
-//	j1850_pwm_init();
-//	j1850_send[0] = 0x61;
-//	j1850_send[1] = 0x6A;
-//	j1850_send[2] = 0xF1;
-//	j1850_send[3] = 0x01;
-//	j1850_send[4] = 0x0c;
-//	j1850_send[5] = j1850_crc(j1850_send,5);
-//	
-//	while (1)
-//	{
-//		j1850_pwm_send_msg(j1850_send,6);
-//		j1850_pwm_recv_msg(j1850_recv);
-//		delay_us(500000);
-//	}
 	
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
