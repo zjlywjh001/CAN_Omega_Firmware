@@ -29,6 +29,8 @@
 unsigned char timestamping = 0;
 unsigned char kmsgpending = 0;
 unsigned char msglen = 0;
+unsigned char pauseflag = 0;
+unsigned char stopflag = 0;
 
 /**
  * Parse hex value of given string
@@ -282,25 +284,17 @@ void parseLine(char * line) {
 		case 'f': // CAN Fuzzing
 			if (state == STATE_OPEN)
 			{
-				if (line[1]=='z')  //pause fuzzing
+				if (line[1]=='z' && fuzz && !fuzzpause)  //pause fuzzing
 				{
-					fuzzpause = 1;
-					HAL_TIM_Base_Stop(&htim5);
-					__HAL_TIM_SET_COUNTER(&htim5,0);
-					lastcounter = 0;
-					sendFuzzProcess();
-					result = 13;
-					printf("f");
+					pauseflag = 1;
+					return ;
 				}
-				else if (line[1] == 'P')  //Stop Fuzzing
+				else if (line[1] == 'P' && fuzz)  //Stop Fuzzing
 				{
-					fuzzpause = 0;
-					fuzz = 0;
-					sendFuzzProcess();
-					result = 13;
-					printf("f");
+					stopflag = 1;
+					return ;
 				}
-				else if (line[1]=='r')  //Resume Fuzzing
+				else if (line[1]=='r' && fuzz && fuzzpause)  //Resume Fuzzing
 				{
 					if (fuzz)
 					{
@@ -313,13 +307,15 @@ void parseLine(char * line) {
 				}
 				else if ((line[1]=='d' || line[1]=='D')&&(!fuzz)) //config & start fuzzing
 				{
+					pauseflag = 0;
+					stopflag = 0;
 					if (config_fuzzer(&line[1]))
 					{
 						for (int i = 0; i < fuzzdlc; i++)
 						{
 							fuzzdata[i] = fuzzfrom[i];
 						}
-						fuzz = 1;
+						fuzz = 1;						
 						HAL_TIM_Base_Start(&htim5);
 						result = 13;
 						printf("f");
@@ -397,29 +393,53 @@ void parseLine(char * line) {
 			break; 
 		case 'b':  //RESET Device
 			ResetFuzzer();
+			k_state = K_UNKNOWN;
 			if (state != STATE_CONFIG)
 			{
 				mcp2515_bit_modify(MCP2515_REG_CANCTRL, 0xE0, 0x80); // set configuration mode
 				state = STATE_CONFIG;
 			}
+			
 			result = 13;
 			break;
 		case 'k':  //K Line transreceiver;
-			if (kmsgpending==0)
+			if (kmsgpending==0 && (!fuzz))
 			{
 				switch(line[1])
 				{
+					case 'a': //activate Bus
+						switch (line[2])
+						{
+							case 'i': //5baud activate ISO9141-2
+								break; //not support
+							case 'I': // 5 baud activate KWP2000
+								break; //not support
+							case 'k': //Fast init KWP2000
+								if (k_state != K_KWP2000_FAST_ACTIVE)
+								{
+									KWP2000_Fast_Init();
+								}
+								printf("%c",'o');
+								result = 13;
+								break;
+						}
+						break;
+					case 'd': //deactivate Bus
+						k_state = K_UNKNOWN;
+						sendkl = 0;
+						result = 13;
+						break;
 					case 'i':   //i stand for ISO9141-2
 						break; // outdated
 					case 'I': //I stand for KWP2000_5BAUD
 						break; // outdated
 					case 'k': //k stand for KWP2000_FAST
-						if (k_state == K_UNKNOWN)
-						{
-							KWP2000_Fast_Init();
-							//Init_5Baud(0x33);
-							//k_state = K_KWP2000_FAST_ACTIVE;
-						}
+//						if (k_state == K_UNKNOWN)
+//						{
+//							KWP2000_Fast_Init();
+//							//Init_5Baud(0x33);
+//							//k_state = K_KWP2000_FAST_ACTIVE;
+//						}
 						if(k_state == K_KWP2000_FAST_ACTIVE)
 						{
 							if (KWP2000FastMessage(&line[2]))
@@ -434,37 +454,40 @@ void parseLine(char * line) {
 			}
 			break;
 		case 'j':  //j1850 PWM/VPW transreceiver
-			switch(line[1])
+			if (!fuzz) 
 			{
-				case 'p':  //PWM Mode
-					if (j1850_mode != MODE_PWM)
-					{
-						j1850_pwm_init();
-					}
-					if (j1850_mode == MODE_PWM)
-					{
-						printf("%c",'w');
-						if (J1850PWMMessage(&line[2]))
+				switch(line[1])
+				{
+					case 'p':  //PWM Mode
+						if (j1850_mode != MODE_PWM)
 						{
-							return ;
+							j1850_pwm_init();
 						}
-					}
-					break;
-				case 'v':  //VPW mode
-					if (j1850_mode != MODE_VPW)
-					{
-						j1850_vpw_init();
-					}
-					if (j1850_mode == MODE_VPW)
-					{
-						if (J1850VPWMessage(&line[2]))
+						if (j1850_mode == MODE_PWM)
 						{
-							printf("%c",'z');
-							result = 13;
-							
+							printf("%c",'w');
+							if (J1850PWMMessage(&line[2]))
+							{
+								return ;
+							}
 						}
-					}
-					break;
+						break;
+					case 'v':  //VPW mode
+						if (j1850_mode != MODE_VPW)
+						{
+							j1850_vpw_init();
+						}
+						if (j1850_mode == MODE_VPW)
+						{
+							if (J1850VPWMessage(&line[2]))
+							{
+								printf("%c",'z');
+								result = 13;
+								
+							}
+						}
+						break;
+				}
 			}
 			break;
 		case 'U':  //firmware upgrade
@@ -602,7 +625,6 @@ void ResetFuzzer()
 
 void sendFuzzProcess()
 {
-	
 	if (fuzzextend)
 	{
 		printf("%c",'G');
@@ -685,11 +707,15 @@ unsigned char config_fuzzer(char *config)
 		
 		
 	}
-	else if (config[pos-1]=='S')
+	else if (config[pos-1]=='S' && config[i]=='\0' )
 	{
 		int plen = i-(pos + 1 + fuzzdlc*4) - 1;
 		if (!parseHex(&config[pos + 1 +fuzzdlc*4+1], plen, &temp)) return 0;
 		fuzzperiod = temp;
+	}
+	else 
+	{
+		return 0;
 	}
 	return 1;
 }

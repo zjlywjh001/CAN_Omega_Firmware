@@ -215,6 +215,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		if (p3_timer!=0)
 		{
 			p3_timer--;
+			if (p3_timer<1000 && k_state != K_UNKNOWN && !sendkl) 
+			{
+				p3_timer = 3000;
+				sendkl = 1;
+			}
 			if (p3_timer==0)
 			{
 				k_state = K_UNKNOWN;

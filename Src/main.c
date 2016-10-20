@@ -187,6 +187,7 @@ int main(void)
 						}
 						if (i==recvmsg.dlc) 
 						{
+							printf("u\r");
 							fuzzfin = 1;
 							ResetFuzzer() ;
 						}
@@ -244,11 +245,35 @@ int main(void)
 				getNextFuzzData();
 				if (fuzzfin)
 				{
+					printf("u\r");
 					ResetFuzzer() ;
 				}
 				
 			}
-			
+
+		}
+		
+		if (fuzz) 
+		{
+			if (pauseflag) 
+			{
+				fuzzpause = 1;
+				HAL_TIM_Base_Stop(&htim5);
+				__HAL_TIM_SET_COUNTER(&htim5,0);
+				lastcounter = 0;
+				//sendFuzzProcess();
+				printf("f\r");
+				pauseflag = 0;
+			}
+			if (stopflag) 
+			{
+				fuzzpause = 0;
+				fuzz = 0;
+				ResetFuzzer();
+				//sendFuzzProcess();
+				printf("f\r");
+				stopflag = 0;
+			}
 		}
 		
 		if (kmsgpending)
@@ -265,6 +290,20 @@ int main(void)
 			}
 			kmsgpending = 0;
 		}
+		
+			if (k_state==K_KWP2000_FAST_ACTIVE && sendkl)
+			{
+				u8 keepalive[12];
+				u8 rubbish[12];
+				keepalive[0] = 0xc1;
+				keepalive[1] = 0x33;
+				keepalive[2] = 0xF1;
+				keepalive[3] = 0x3E;
+				keepalive[4] = checksum(keepalive,4);
+				KWP2000_Fast_Transreceiver(keepalive,5,rubbish);
+				sendkl = 0;
+				
+			}
 		
 		if (j1850_mode==MODE_VPW)
 		{

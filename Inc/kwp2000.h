@@ -47,6 +47,7 @@ typedef struct {
 } KWP2000struct_t;
 
 extern u8 KWP2000ProtocolVersion[2];
+extern u8 sendkl;
 
 u8 ISO9141Init(u16 * uartSpeed);
 u8 KWP2000SendBlock(KWP2000struct_t * block);

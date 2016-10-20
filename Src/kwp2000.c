@@ -11,6 +11,7 @@ vu16 timer1 = 0;
 vu16 timer2 = 0;
 vu16 timerKW = 0;
 int p3_timer = 0;
+u8 sendkl=0;
 
 
 u8  kwp2000_max_init_attempts = 2; 
@@ -33,20 +34,42 @@ u8 k_state = K_UNKNOWN;
      0x8f - odczytany zostal inny bajt niz wyslany (halfduplex)
      0xff - timeout
 */
-/*
+
 u8 ISO9141Init(u16 * uartSpeed) 
 {
   u8 c, keyword;
   int i;
   u16 time, t2;
+	u8 ok;
 	
-	Init_5Baud(0x01);
+	c=0;
+	while (!ok)
+	{
+		Init_5Baud(0x01);
+		
+		MX_USART2_UART_Init(10400);
+		timer1=3000;
+		
+		while ((__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE) == RESET) && timer1);
+		
+		if (timer1!=0)
+		{
+			c = huart2.Instance->DR & 0x00FF;
+		}
+		
+		
+		if (c==0x55)
+		{
+			ok =1;
+		}
+	}
+	
 	
   timer1=1000;
 
   if (0 == (*uartSpeed))
   {
-    while ((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3)) && timer1) ;
+    while ((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3) == SET) && timer1) ;
     if (0 == timer1) 
     {
       return 0xff; 
@@ -56,15 +79,16 @@ u8 ISO9141Init(u16 * uartSpeed)
 		__HAL_TIM_SET_COUNTER(&htim3,0);
 		HAL_TIM_Base_Start(&htim3);
     //t2 = timer1;
+		
 
     for (i=0; i<4; i++)
     {
-      while ((0 == HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3)) && timer1) ;
+      while ((RESET == HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3)) && timer1) ;
       if (0 == timer1) 
       {
         return 0xff; 
       }
-      while ((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3)) && timer1); 
+      while ((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3)==SET) && timer1); 
       if (0 == timer1) 
       {
         return 0xff; 
@@ -91,9 +115,6 @@ u8 ISO9141Init(u16 * uartSpeed)
 
 		MX_USART2_UART_Init(*uartSpeed);
 		
-    timer1=2; //2ms
-    while (timer1);
-    HAL_UART_Receive(&huart2, &c, 1, 100);
   }
   else
   {
@@ -101,14 +122,22 @@ u8 ISO9141Init(u16 * uartSpeed)
 		
     MX_USART2_UART_Init(*uartSpeed);
 		
-    HAL_UART_Receive(&huart2, &c, 1, 100);
+//    HAL_UART_Receive(&huart2, &c, 1, 100);
+//		
+//		if (HAL_UART_Receive(&huart2, &c, 1, t2)!=HAL_OK)
+//		{
+//			return 0xff; 
+//		}
 		
-		if (HAL_UART_Receive(&huart2, &c, 1, t2)!=HAL_OK)
+		timer1 = 20000;
+		while ((__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE) == RESET) && timer1);
+		if (timer1==0)
 		{
 			return 0xff; 
-		}
+		}			
+		c = huart2.Instance->DR & 0x00FF;
  
-    HAL_UART_Receive(&huart2, &c, 1, 100);
+    //HAL_UART_Receive(&huart2, &c, 1, 0xFFFF);
     if (0x55 != c) 
     {
       return 0x7f; //sync err 
@@ -150,7 +179,7 @@ u8 ISO9141Init(u16 * uartSpeed)
 
   timer1 = 0;
   return 0x00;
-}*/
+}
 
 void KWP2000_Fast_Init()
 {
@@ -200,6 +229,9 @@ void Init_5Baud(u8 addr)
 {
 	int i;
 	USART2_Deinit();
+	
+	delay_us(300000);
+	
 	TXDK(0); //start bit
 	TXDL(0);
 	delay_us(200000);
@@ -216,23 +248,6 @@ void Init_5Baud(u8 addr)
 	TXDL(1);
 	
 	delay_us(200000);
-	
-	MX_USART2_UART_Init(10400);
-	
-	timer1 = 100;
-	while ((__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE) == RESET) && timer1);
-	
-	if (timer1==0)
-	{
-		return ;
-	}
-	u8 c= huart2.Instance->DR & 0x00FF;
-		
-  if (0x55 != c) 
-  {
-     return ; //sync err 
-  }
-	
 	
 }
 

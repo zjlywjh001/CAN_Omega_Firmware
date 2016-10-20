@@ -19,6 +19,8 @@
 
 extern unsigned char kmsgpending;
 extern unsigned char msglen;
+extern unsigned char pauseflag;
+extern unsigned char stopflag;
 
 unsigned char transmitStd(char *line);
 void parseLine(char * line);
