@@ -445,7 +445,9 @@ void parseLine(char * line) {
 							if (KWP2000FastMessage(&line[2]))
 							{
 								kmsgpending = 1;
-								printf("%c",'z');
+								sendkl = 0;
+								p3_timer = P3_TIMEOUT;
+								printf("%c",'x');
 								result = 13;
 							}
 						}
@@ -465,9 +467,10 @@ void parseLine(char * line) {
 						}
 						if (j1850_mode == MODE_PWM)
 						{
-							printf("%c",'w');
+							printf("x\r");
 							if (J1850PWMMessage(&line[2]))
 							{
+								
 								return ;
 							}
 						}
@@ -481,7 +484,7 @@ void parseLine(char * line) {
 						{
 							if (J1850VPWMessage(&line[2]))
 							{
-								printf("%c",'z');
+								printf("%c",'x');
 								result = 13;
 								
 							}
@@ -779,6 +782,7 @@ u8 J1850PWMMessage(char* data)
 	
 
 	j1850_pwm_send_msg((u8*)j1850_send,j1850_msglen);
+	
 	u8 cnt = j1850_pwm_recv_msg((u8*)recvbuffer);
 	if (cnt>0 && (!(cnt&0x80)))
 	{

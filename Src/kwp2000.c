@@ -37,7 +37,7 @@ u8 k_state = K_UNKNOWN;
 
 u8 ISO9141Init(u16 * uartSpeed) 
 {
-  u8 c, keyword;
+  u8 c;
   int i;
   u16 time, t2;
 	u8 ok;
@@ -206,18 +206,21 @@ u8 KWP2000_Fast_Transreceiver(u8 *msg,int len,u8* recvbuffer)
 	
 	u8 rubbish;
 	rubbish = huart2.Instance->DR & 0x00FF;
-	delay_us(10000);
 	
 	i = 0;
 	timer1 = 100;
-	while (timer1)
+	while (1)
 	{
 		while ((__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE) == RESET) && timer1);
 		if (timer1==0) 
+		{
 			break;
+		} 
 		recvbuffer[i] = huart2.Instance->DR & 0x00FF;
 		timer1 = 100;
 		i++;
+		if (i>=256)
+			break;
 	}
 	
 	return i;

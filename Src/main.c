@@ -79,6 +79,8 @@ volatile unsigned int lastcounter;
 u8 uart_recvdata = 0;
 char line[LINE_MAXLEN];
 unsigned char linepos = 0;
+u8 keepalive[5];
+u8 rubbish[12];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -96,7 +98,6 @@ void SystemClock_Config(void);
 int main(void)
 {
 	u8 cnt;
-
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -144,13 +145,13 @@ int main(void)
 	//printf("Hello World!\r\n");
 
   /* USER CODE END 2 */
-	
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
 	
   while (1)
   {
+		int resplen;
 		//printf("Hello World!\r\n");
 		HAL_UART_Receive_IT(&huart1,&uart_recvdata,1);  
 		
@@ -278,7 +279,7 @@ int main(void)
 		
 		if (kmsgpending)
 		{
-			int resplen = KWP2000_Fast_Transreceiver(sendmessage,msglen,recvmessage);
+			resplen = KWP2000_Fast_Transreceiver(sendmessage,msglen,recvmessage);
 			if (resplen>0)
 			{
 				printf("%c",'k');
@@ -288,25 +289,24 @@ int main(void)
 				}
 				printf("\r");
 			}
+			resplen = 0;
 			kmsgpending = 0;
 		}
 		
-			if (k_state==K_KWP2000_FAST_ACTIVE && sendkl)
-			{
-				u8 keepalive[12];
-				u8 rubbish[12];
-				keepalive[0] = 0xc1;
-				keepalive[1] = 0x33;
-				keepalive[2] = 0xF1;
-				keepalive[3] = 0x3E;
-				keepalive[4] = checksum(keepalive,4);
-				KWP2000_Fast_Transreceiver(keepalive,5,rubbish);
-				sendkl = 0;
-				
-			}
+		if (k_state==K_KWP2000_FAST_ACTIVE && sendkl)
+		{
+			keepalive[0] = 0xc1;
+			keepalive[1] = 0x33;
+			keepalive[2] = 0xF1;
+			keepalive[3] = 0x3E;
+			keepalive[4] = checksum(keepalive,4);
+			KWP2000_Fast_Transreceiver(keepalive,5,rubbish);
+			sendkl = 0;
+		}
 		
 		if (j1850_mode==MODE_VPW)
 		{
+
 			cnt = j1850_vpw_recv_msg(j1850_recv);
 	
 			if (cnt>0 && (!(cnt&0x80)))

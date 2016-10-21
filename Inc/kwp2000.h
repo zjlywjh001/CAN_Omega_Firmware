@@ -22,6 +22,7 @@
 #define K_ISO9141_ACTIVE 1 
 #define K_KWP2000_FAST_ACTIVE 2
 #define K_KWP2000_5BAUD_ACTIVE 3
+#define P3_TIMEOUT 5000
 
 extern vu16 timer1;
 extern vu16 timer2;
