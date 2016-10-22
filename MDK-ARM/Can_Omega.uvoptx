@@ -153,50 +153,18 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>285</LineNumber>
+          <LineNumber>402</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134287788</Address>
+          <Address>134280878</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../Src/main.c</Filename>
+          <Filename>..\Src\kwp2000.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\Can_Omega\../Src/main.c\285</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>495</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134285052</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../Src/main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\Can_Omega\../Src/main.c\495</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>494</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134285040</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../Src/main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\Can_Omega\../Src/main.c\494</Expression>
+          <Expression>\\Can_Omega\../Src/kwp2000.c\402</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -223,232 +191,237 @@
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>config[0x26]</ItemText>
+          <ItemText>fuzzfrom</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>fuzzfrom</ItemText>
+          <ItemText>fuzzto</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>fuzzto</ItemText>
+          <ItemText>pos + 1 + fuzzdlc*4</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>pos + 1 + fuzzdlc*4</ItemText>
+          <ItemText>plen</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>plen</ItemText>
+          <ItemText>pos2</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>pos2</ItemText>
+          <ItemText>i</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>i</ItemText>
+          <ItemText>fuzzuntildata</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>1</WinNumber>
-          <ItemText>fuzzuntildata</ItemText>
+          <ItemText>fuzzuntilmask</ItemText>
         </Ww>
         <Ww>
           <count>12</count>
           <WinNumber>1</WinNumber>
-          <ItemText>fuzzuntilmask</ItemText>
+          <ItemText>fuzzperiod</ItemText>
         </Ww>
         <Ww>
           <count>13</count>
           <WinNumber>1</WinNumber>
-          <ItemText>fuzzperiod</ItemText>
+          <ItemText>fuzzdlc</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>1</WinNumber>
-          <ItemText>fuzzdlc</ItemText>
+          <ItemText>fuzzextend</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
           <WinNumber>1</WinNumber>
-          <ItemText>fuzzextend</ItemText>
+          <ItemText>fuzzprio</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>1</WinNumber>
-          <ItemText>fuzzprio</ItemText>
+          <ItemText>fuzz</ItemText>
         </Ww>
         <Ww>
           <count>17</count>
           <WinNumber>1</WinNumber>
-          <ItemText>fuzz</ItemText>
+          <ItemText>fuzzdata</ItemText>
         </Ww>
         <Ww>
           <count>18</count>
           <WinNumber>1</WinNumber>
-          <ItemText>fuzzdata</ItemText>
+          <ItemText>sendbit</ItemText>
         </Ww>
         <Ww>
           <count>19</count>
           <WinNumber>1</WinNumber>
-          <ItemText>sendbit</ItemText>
+          <ItemText>paribit</ItemText>
         </Ww>
         <Ww>
           <count>20</count>
           <WinNumber>1</WinNumber>
-          <ItemText>paribit</ItemText>
+          <ItemText>addr</ItemText>
         </Ww>
         <Ww>
           <count>21</count>
           <WinNumber>1</WinNumber>
-          <ItemText>addr</ItemText>
+          <ItemText>msg</ItemText>
         </Ww>
         <Ww>
           <count>22</count>
           <WinNumber>1</WinNumber>
-          <ItemText>msg</ItemText>
+          <ItemText>x</ItemText>
         </Ww>
         <Ww>
           <count>23</count>
           <WinNumber>1</WinNumber>
-          <ItemText>x</ItemText>
+          <ItemText>sendmessage</ItemText>
         </Ww>
         <Ww>
           <count>24</count>
           <WinNumber>1</WinNumber>
-          <ItemText>sendmessage</ItemText>
+          <ItemText>recvmessage</ItemText>
         </Ww>
         <Ww>
           <count>25</count>
           <WinNumber>1</WinNumber>
-          <ItemText>recvmessage</ItemText>
+          <ItemText>kmsgpending</ItemText>
         </Ww>
         <Ww>
           <count>26</count>
           <WinNumber>1</WinNumber>
-          <ItemText>kmsgpending</ItemText>
+          <ItemText>uartSpeed</ItemText>
         </Ww>
         <Ww>
           <count>27</count>
           <WinNumber>1</WinNumber>
-          <ItemText>uartSpeed</ItemText>
+          <ItemText>timer1</ItemText>
         </Ww>
         <Ww>
           <count>28</count>
           <WinNumber>1</WinNumber>
-          <ItemText>timer1</ItemText>
+          <ItemText>j1850_send</ItemText>
         </Ww>
         <Ww>
           <count>29</count>
           <WinNumber>1</WinNumber>
-          <ItemText>j1850_send</ItemText>
+          <ItemText>temp_byte</ItemText>
         </Ww>
         <Ww>
           <count>30</count>
           <WinNumber>1</WinNumber>
-          <ItemText>temp_byte</ItemText>
+          <ItemText>msg_buf</ItemText>
         </Ww>
         <Ww>
           <count>31</count>
           <WinNumber>1</WinNumber>
-          <ItemText>msg_buf</ItemText>
+          <ItemText>temp_byte</ItemText>
         </Ww>
         <Ww>
           <count>32</count>
           <WinNumber>1</WinNumber>
-          <ItemText>temp_byte</ItemText>
+          <ItemText>result</ItemText>
         </Ww>
         <Ww>
           <count>33</count>
           <WinNumber>1</WinNumber>
-          <ItemText>result</ItemText>
+          <ItemText>kmsgpending</ItemText>
         </Ww>
         <Ww>
           <count>34</count>
           <WinNumber>1</WinNumber>
-          <ItemText>kmsgpending</ItemText>
+          <ItemText>t2</ItemText>
         </Ww>
         <Ww>
           <count>35</count>
           <WinNumber>1</WinNumber>
-          <ItemText>t2</ItemText>
+          <ItemText>t1</ItemText>
         </Ww>
         <Ww>
           <count>36</count>
           <WinNumber>1</WinNumber>
-          <ItemText>t1</ItemText>
+          <ItemText>timer1</ItemText>
         </Ww>
         <Ww>
           <count>37</count>
           <WinNumber>1</WinNumber>
-          <ItemText>timer1</ItemText>
+          <ItemText>recvmsg</ItemText>
         </Ww>
         <Ww>
           <count>38</count>
           <WinNumber>1</WinNumber>
-          <ItemText>recvmsg</ItemText>
+          <ItemText>i</ItemText>
         </Ww>
         <Ww>
           <count>39</count>
           <WinNumber>1</WinNumber>
-          <ItemText>i</ItemText>
+          <ItemText>fuzzuntilmask</ItemText>
         </Ww>
         <Ww>
           <count>40</count>
           <WinNumber>1</WinNumber>
-          <ItemText>fuzzuntilmask</ItemText>
+          <ItemText>result</ItemText>
         </Ww>
         <Ww>
           <count>41</count>
           <WinNumber>1</WinNumber>
-          <ItemText>result</ItemText>
+          <ItemText>line[0]</ItemText>
         </Ww>
         <Ww>
           <count>42</count>
           <WinNumber>1</WinNumber>
-          <ItemText>line[0]</ItemText>
+          <ItemText>stopflag</ItemText>
         </Ww>
         <Ww>
           <count>43</count>
           <WinNumber>1</WinNumber>
-          <ItemText>stopflag</ItemText>
+          <ItemText>cnt</ItemText>
         </Ww>
         <Ww>
           <count>44</count>
           <WinNumber>1</WinNumber>
-          <ItemText>cnt</ItemText>
+          <ItemText>now</ItemText>
         </Ww>
         <Ww>
           <count>45</count>
           <WinNumber>1</WinNumber>
-          <ItemText>now</ItemText>
+          <ItemText>to</ItemText>
         </Ww>
         <Ww>
           <count>46</count>
           <WinNumber>1</WinNumber>
-          <ItemText>to</ItemText>
+          <ItemText>resplen</ItemText>
         </Ww>
         <Ww>
           <count>47</count>
           <WinNumber>1</WinNumber>
-          <ItemText>resplen</ItemText>
+          <ItemText>recvmessage</ItemText>
         </Ww>
         <Ww>
           <count>48</count>
           <WinNumber>1</WinNumber>
-          <ItemText>recvmessage</ItemText>
+          <ItemText>sendkl</ItemText>
         </Ww>
         <Ww>
           <count>49</count>
           <WinNumber>1</WinNumber>
-          <ItemText>sendkl</ItemText>
+          <ItemText>c</ItemText>
+        </Ww>
+        <Ww>
+          <count>50</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>KWP2000ProtocolVersion</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

@@ -79,8 +79,7 @@ volatile unsigned int lastcounter;
 u8 uart_recvdata = 0;
 char line[LINE_MAXLEN];
 unsigned char linepos = 0;
-u8 keepalive[5];
-u8 rubbish[12];
+u8 keepalive[7];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -143,7 +142,6 @@ int main(void)
 	
 	//fuzz_test_setting();
 	//printf("Hello World!\r\n");
-
   /* USER CODE END 2 */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -279,7 +277,13 @@ int main(void)
 		
 		if (kmsgpending)
 		{
-			resplen = KWP2000_Fast_Transreceiver(sendmessage,msglen,recvmessage);
+			KWP2000_SendMsg(sendmessage,msglen);
+			kmsgpending = 0;
+		}
+		
+		if (k_state!=K_UNKNOWN) 
+		{
+			resplen = KWP2000_RecvMsg(recvmessage);
 			if (resplen>0)
 			{
 				printf("%c",'k');
@@ -290,17 +294,29 @@ int main(void)
 				printf("\r");
 			}
 			resplen = 0;
-			kmsgpending = 0;
 		}
 		
-		if (k_state==K_KWP2000_FAST_ACTIVE && sendkl)
+		if (sendkl)
 		{
-			keepalive[0] = 0xc1;
-			keepalive[1] = 0x33;
-			keepalive[2] = 0xF1;
-			keepalive[3] = 0x3E;
-			keepalive[4] = checksum(keepalive,4);
-			KWP2000_Fast_Transreceiver(keepalive,5,rubbish);
+			if (k_state==K_ISO9141_ACTIVE) 
+			{
+				keepalive[0] = 0x68;
+				keepalive[1] = 0x6A;
+				keepalive[2] = 0xF1;
+				keepalive[3] = 0x01;
+				keepalive[4] = 0x00;
+				keepalive[5] = checksum(keepalive,5);
+				KWP2000_SendMsg(keepalive,6);
+			} 
+			else if (k_state==K_KWP2000_FAST_ACTIVE || k_state==K_KWP2000_5BAUD_ACTIVE) 
+			{
+				keepalive[0] = 0xc1;
+				keepalive[1] = 0x33;
+				keepalive[2] = 0xF1;
+				keepalive[3] = 0x3E;
+				keepalive[4] = checksum(keepalive,4);
+				KWP2000_SendMsg(keepalive,5);
+			}
 			sendkl = 0;
 		}
 		
@@ -327,6 +343,28 @@ int main(void)
 		else if (j1850_mode == MODE_PWM)
 		{
 			
+		}
+		
+		if (activatetask==1)
+		{
+			u16 tmp = 0; //0 for auto baudrate
+			if (ISO9141Init(&tmp)==0) 
+			{
+				k_state = K_ISO9141_ACTIVE;
+				p3_timer = P3_TIMEOUT;
+				printf("o\r");
+			}
+			activatetask = 0;
+		}
+		else if (activatetask==2)
+		{
+			if (KWP2000_5Baud_Init()==0) 
+			{
+				k_state = K_KWP2000_5BAUD_ACTIVE;
+				p3_timer = P3_TIMEOUT;
+				printf("o\r");
+			}
+			activatetask = 0;
 		}
 
   }

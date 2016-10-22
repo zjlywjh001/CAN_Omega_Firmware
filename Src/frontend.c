@@ -31,6 +31,7 @@ unsigned char kmsgpending = 0;
 unsigned char msglen = 0;
 unsigned char pauseflag = 0;
 unsigned char stopflag = 0;
+unsigned char activatetask = 0;
 
 /**
  * Parse hex value of given string
@@ -394,6 +395,11 @@ void parseLine(char * line) {
 		case 'b':  //RESET Device
 			ResetFuzzer();
 			k_state = K_UNKNOWN;
+			j1850_mode = MODE_UNKNOWN;
+			activatetask = 0;
+			kmsgpending = 0;
+			p3_timer = 0;
+			sendkl = 0;
 			if (state != STATE_CONFIG)
 			{
 				mcp2515_bit_modify(MCP2515_REG_CANCTRL, 0xE0, 0x80); // set configuration mode
@@ -410,14 +416,32 @@ void parseLine(char * line) {
 					case 'a': //activate Bus
 						switch (line[2])
 						{
-							case 'i': //5baud activate ISO9141-2
-								break; //not support
+							case 'i': 
+								if (k_state!= K_ISO9141_ACTIVE)
+								{
+									if (activatetask==0) 
+									{
+										activatetask = 1;
+										return ;
+									}
+								}
+								break; 
 							case 'I': // 5 baud activate KWP2000
-								break; //not support
+								if (k_state!= K_KWP2000_5BAUD_ACTIVE)
+								{
+									if (activatetask==0) 
+									{
+										activatetask = 2;
+										return ;
+									}
+								}
+								break; 
 							case 'k': //Fast init KWP2000
 								if (k_state != K_KWP2000_FAST_ACTIVE)
 								{
 									KWP2000_Fast_Init();
+									k_state = K_KWP2000_FAST_ACTIVE;
+									p3_timer = P3_TIMEOUT;
 								}
 								printf("%c",'o');
 								result = 13;
@@ -430,17 +454,9 @@ void parseLine(char * line) {
 						result = 13;
 						break;
 					case 'i':   //i stand for ISO9141-2
-						break; // outdated
 					case 'I': //I stand for KWP2000_5BAUD
-						break; // outdated
 					case 'k': //k stand for KWP2000_FAST
-//						if (k_state == K_UNKNOWN)
-//						{
-//							KWP2000_Fast_Init();
-//							//Init_5Baud(0x33);
-//							//k_state = K_KWP2000_FAST_ACTIVE;
-//						}
-						if(k_state == K_KWP2000_FAST_ACTIVE)
+						if(k_state != K_UNKNOWN)
 						{
 							if (KWP2000FastMessage(&line[2]))
 							{
