@@ -7,7 +7,7 @@ Firmware should work with bootloader here:
 [https://github.com/zjlywjh001/CAN_OMEGA/blob/master/software/firmware/bootloader.hex](https://github.com/zjlywjh001/CAN_OMEGA/blob/master/software/firmware/bootloader.hex)   
 
 ## Features  
-Support for the following protocols:
+Support for the following protocols:   
 ISO15765 CAN250Kbps 11bit   
 ISO15765 CAN250Kbps 29bit   
 ISO15765 CAN500Kbps 11bit   
