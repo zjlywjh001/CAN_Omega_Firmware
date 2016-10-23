@@ -247,6 +247,8 @@ u8 ISO9141Init(u16 * uartSpeed)
 
 void KWP2000_Fast_Init()
 {
+	
+	USART2_Deinit();
 
 	TXDK(0);
 	TXDL(0);

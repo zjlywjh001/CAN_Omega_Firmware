@@ -51,7 +51,7 @@ typedef __I uint8_t vuc8;   /*!< Read Only */
 #define VERSION_HARDWARE_MAJOR 1
 #define VERSION_HARDWARE_MINOR 0
 #define VERSION_FIRMWARE_MAJOR 1
-#define VERSION_FIRMWARE_MINOR 0
+#define VERSION_FIRMWARE_MINOR 1
 
 
 #define CANMSG_BUFFERSIZE 8
