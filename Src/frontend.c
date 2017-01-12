@@ -400,6 +400,7 @@ void parseLine(char * line) {
 			kmsgpending = 0;
 			p3_timer = 0;
 			sendkl = 0;
+			Terminal_Resistor_Open_Circuit;
 			if (state != STATE_CONFIG)
 			{
 				mcp2515_bit_modify(MCP2515_REG_CANCTRL, 0xE0, 0x80); // set configuration mode
@@ -513,7 +514,15 @@ void parseLine(char * line) {
 			__set_FAULTMASK(1);
 			HAL_NVIC_SystemReset();
 			break;
-	}
+		case 'A': //terminal resistor open circuit;
+			Terminal_Resistor_Open_Circuit;
+			result = 13;
+			break;
+		case 'a': //terminal resistor 120 Ohms;
+			Terminal_Resistor_120Ohms;
+			result = 13;
+			break;		
+	}	
 	
 	printf("%c",result);
 }

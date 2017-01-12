@@ -49,18 +49,21 @@ typedef __I uint8_t vuc8;   /*!< Read Only */
 #define STATE_OPEN 1
 #define STATE_LISTEN 2
 #define VERSION_HARDWARE_MAJOR 1
-#define VERSION_HARDWARE_MINOR 0
+#define VERSION_HARDWARE_MINOR 0x10
 #define VERSION_FIRMWARE_MAJOR 1
-#define VERSION_FIRMWARE_MINOR 1
+#define VERSION_FIRMWARE_MINOR 0x10
 
 
-#define CANMSG_BUFFERSIZE 8
+#define CANMSG_BUFFERSIZE 40
 
 #define STATE_CONFIG 0
 #define STATE_OPEN 1
 #define STATE_LISTEN 2
 
 #define hardware_getMCP2515Int() HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_13)==GPIO_PIN_RESET
+
+#define Terminal_Resistor_Open_Circuit HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET)
+#define Terminal_Resistor_120Ohms HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET)
 
 extern volatile unsigned char state;
 extern volatile unsigned char fuzz;
