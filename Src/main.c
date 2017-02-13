@@ -159,7 +159,7 @@ int main(void)
 			if (mcp2515_receive_message(&canmsg_buffer[canmsg_buffer_canpos]))
 			{
 				canmsg_t recvmsg = canmsg_buffer[canmsg_buffer_canpos];
-				if ((recvmsg.data[0]&0xF0)>>4==0x01)   //if a multi-frame message send flow control message
+				if (((recvmsg.data[0]&0xF0)>>4==0x01)&&(state==STATE_OPEN))   //if a multi-frame message send flow control message
 				{
 					canmsg_t fcmsg;
 					fcmsg.id = recvmsg.id;
